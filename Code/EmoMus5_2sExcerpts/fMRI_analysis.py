@@ -53,6 +53,7 @@ class fMRI_analysis():
 
         print "\nEmoMus5_Test_2s -> Starting processing prediction model for user ", self.user
 
+        (self.lenX,self.lenY,self.lenZ,self.scans) = np.shape(self.data) # 4D axisx
         self.f_ind = ANOVA_Ind # ANOVA analysis best voxels indexes
         self.emotions = emotionsIndexes
         self._readEmotionGroupScans() #Read emotion group scans and save it into numpy array
@@ -157,23 +158,21 @@ class fMRI_analysis():
       self._setUpMainLoopLists()
 
       self.test_List = ['Anxious','Happy','Neutral']
-      for dist in self.distance_list:   
-         print "Dist = ", dist
-         indDist = self.distance_list.index(dist)
-         self.ws.write(2+(len(self.test_List)+3)*indDist, 0, dist)
-         for n, test in enumerate(self.test_List):
-             self.ws.write(n+3+(len(self.test_List)+3)*indDist, 0, test)
-         
-         self.ws.write(len(self.test_List)+3+(len(self.test_List)+3)*indDist, 0, 'Total')
-         for PM_method in self.PM_list:
-             print "Prediction Model technique = ", PM_method
-             indPM = self.PM_list.index(PM_method)
-             self.ws.write(1+(len(self.test_List)+3)*indDist, 1+len(self.numFeat_list)*indPM, PM_method)
-             for numFeat in self.numFeat_list:    
-                 self.numSelFeatures = numFeat
-                 print "NumFeat = ", numFeat   
-                 self._CalcPredictionModel(PM_method)
-                 self._writePM_Results(PM_method,dist)
+      indDist = self.distance_list.index(self.dist)
+      self.ws.write(2+(len(self.test_List)+3)*indDist, 0, self.dist)
+      for n, test in enumerate(self.test_List):
+        self.ws.write(n+3+(len(self.test_List)+3)*indDist, 0, test)
+       
+      self.ws.write(len(self.test_List)+3+(len(self.test_List)+3)*indDist, 0, 'Total')
+
+      for PM_method in self.PM_list:
+
+        print "EmoMus5_Test_2s -> Prediction Model Analysis Technique: " + PM_method
+        indPM = self.PM_list.index(PM_method)
+        self.ws.write(1+(len(self.test_List)+3)*indDist, 1+len(self.numFeat_list)*indPM, PM_method)
+
+        self._CalcPredictionModel(PM_method)
+        self._writePM_Results(PM_method,self.dist)
 
       self.wb.save(self.path + '/ResultsPM_EmoMus5.xls')  
         
@@ -183,6 +182,7 @@ class fMRI_analysis():
       #self.PM_list = ['LinearReg','SVR_rbf']
       
       # The list of prediction model analysis methods
+      self.PM_list = ['LinearReg','SVR_rbf'] 
       self.PM_list = ['LinearReg'] 
       print "EmoMus5_Test_2s -> Prediction Model Analysis methods: " + str(self.PM_list)  
 
@@ -192,7 +192,11 @@ class fMRI_analysis():
       
       # The number of features that you will use
       self.numFeat_list = [self.f_ind.shape[0]]
-      print "EmoMus5_Test_2s -> Making the analysis for the best " + self.numFeat_list + " ANOVA analysis voxels"
+      print "EmoMus5_Test_2s -> Making the analysis for the best " + str(self.numFeat_list) + " ANOVA analysis voxels"
+
+      self.dist = self.distance_list[0]
+      self.numSelFeatures = self.numFeat_list[0]
+      self.numSelFeatures = 1
 
     def _createDescriptorMatrices(self):
         
@@ -212,8 +216,6 @@ class fMRI_analysis():
         self.ws = self.wb.add_sheet(self.user)
         self.ws.write(0, 0, self.user)
         
-       
-
         wb = xlrd.open_workbook(descriptorsPath)
         self.sh = wb.sheet_by_index(0) #get the first sheet
 
@@ -315,151 +317,173 @@ class fMRI_analysis():
         Hap_Accuracy = np.zeros((self.numHaptests)) 
         Neu_Accuracy = np.zeros((self.numNeutests)) 
 
-        self.Anxfeatures = np.zeros([self.numSelFeatures,self.numAnxtests])
-        self.Hapfeatures = np.zeros([self.numSelFeatures,self.numHaptests])
-        self.Neufeatures = np.zeros([self.numSelFeatures,self.numNeutests])
+        self.Anxfeatures = np.zeros([self.numSelFeatures])
+        self.Hapfeatures = np.zeros([self.numSelFeatures])
+        self.Neufeatures = np.zeros([self.numSelFeatures])
+
+        print "EmoMus5_Test_2s -> Starting Prediction Model Calculations and leave two out cross validation" 
 
         total = self.numAnxtests*(self.numHaptests + self.numNeutests) + (self.numHaptests*self.numNeutests)
 
+        print "EmoMus5_Test_2s -> Total number of calculations ", total
+        
         for nAnx in range(self.numAnxtests): 
-            percentage = 100.0*nAnx*(self.numHaptests + self.numNeutests)/total
-            print "User " + str(self.user) + ": " + str(percentage) + "%"
+            #print "nAnx ",nAnx
+            #percentage = 100.0*(nAnx)*(self.numHaptests + self.numNeutests)/total
+            #print "User " + str(self.user) + ": " + str(percentage) + "%"
+
             indAnx = self.descriptorsAnxiousInd[nAnx]#we use the rest of experiments as training data for the mth test
             for nHap in range(self.numHaptests): 
-                percentage = 100.0*(nAnx+1)*(nHap)/total
-                print "User " + str(self.user) + ": " +  str(percentage)  + "%"
+                #print "nHap ",nHap
+                calculationNum = nAnx*(self.numHaptests + self.numNeutests)  + nHap + 1
+                percentage = 100.0*calculationNum/total
+
+                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
+                print "EmoMus5_Test_2s -> Anxious descriptor " + str(nAnx+1) + " out " +  " and Happy descriptor " + str(nHap+1) + " out "
+
                 indHap = self.descriptorsHappyInd[nHap]#we use the rest of experiments as training data for the lth test
-                wavFeatures = np.vstack((self.descriptorsAnxious[indAnx,:],self.descriptorsHappy[indHap,:],
-                                         self.descriptorsNeutral))
+                descriptors = np.vstack((self.descriptorsAnxious[indAnx,:],self.descriptorsHappy[indHap,:], self.descriptorsNeutral))
 
                 self.predictedAnxVolumes = np.zeros(self.numSelFeatures)
                 self.predictedHapVolumes = np.zeros(self.numSelFeatures)
+
                 for n in range(self.numSelFeatures):
                   k = self.f_ind[n]%self.lenY #y axis
                   rest = self.f_ind[n]/self.lenY 
                   j = rest%self.lenX #x axis
                   i = rest/self.lenX #z axis  
                   #print self.anxiousVolumes.shape
-                  self.Anxfeatures[n,:] = self.anxiousVolumes[:,j,k,i] # f_ind
-                  self.Hapfeatures[n,:] = self.happyVolumes[:,j,k,i] # f_ind 
-                  self.Neufeatures[n,:] = self.neutralVolumes[:,j,k,i] # f_ind
+                  self.Anxfeatures[n] = self.anxiousVolumes[nAnx,j,k,i] # f_ind
+                  self.Hapfeatures[n] = self.happyVolumes[nHap,j,k,i] # f_ind 
 
-                  meanFeatures = np.hstack((self.Anxfeatures[n,indAnx],self.Hapfeatures[n,indHap],
-                              self.Neufeatures[n,:]))
+                  meanFeatures = np.hstack((self.anxiousVolumes[indAnx,j,k,i],self.happyVolumes[indHap,j,k,i],
+                              self.neutralVolumes[:,j,k,i] ))
                   
                   if(PM_method == 'LinearReg'):
-                    regr = linear_model.LinearRegression() # self.wavFeatures is an n-by-p matrix of p predictors at each of n observations
-                    regr.fit( wavFeatures,meanFeatures)
+                    regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
+                    regr.fit(descriptors,meanFeatures)
                     # multiple linear regression models by allowing the response variable to be a function of k explanatory variables
                     #print regr.coef_ #coefficients #p0 + p1 + ...pn
-                    self.predictedAnxVolumes = regr.predict(self.descriptorsAnxious[nAnx,:]) # b0 + b1*p1 + ..bn*pn 
-                    self.predictedHapVolumes = regr.predict(self.descriptorsHappy[nHap,:]) # b0 + b1*p1 + ..bn*pn
+                    self.predictedAnxVolumes[n] = regr.predict(self.descriptorsAnxious[nAnx,:]) # b0 + b1*p1 + ..bn*pn 
+                    self.predictedHapVolumes[n] = regr.predict(self.descriptorsHappy[nHap,:]) # b0 + b1*p1 + ..bn*pn
                   else:
-                    svr.fit(wavFeatures, meanFeatures)
-                    self.predictedAnxVolumes = svr.predict(self.descriptorsAnxious[nAnx,:]) 
-                    self.predictedHapVolumes = svr.predict(self.descriptorsHappy[nHap,:])
+                    svr.fit(descriptors, meanFeatures)
+                    self.predictedAnxVolumes[n] = svr.predict(self.descriptorsAnxious[nAnx,:]) 
+                    self.predictedHapVolumes[n] = svr.predict(self.descriptorsHappy[nHap,:])
 
-                    #Calculate the accuracy
-                    AnxrAnxp_dist = spatial.distance.cosine(self.Anxfeatures[:,nAnx],self.predictedAnxVolumes)#dist Anx real vs Anx Predicted
-                    AnxrHapp_dist = spatial.distance.cosine(self.Anxfeatures[:,nAnx],self.predictedHapVolumes)#dist Anx real vs Hap Predicted  
-                    HaprAnxp_dist = spatial.distance.cosine(self.Hapfeatures[:,nHap],self.predictedAnxVolumes)#dist Hap real vs Anx Predicted         
-                    HaprHapp_dist = spatial.distance.cosine(self.Hapfeatures[:,nHap],self.predictedHapVolumes)#dist Hap real vs Hap Predicted
-                    if((AnxrAnxp_dist+ HaprHapp_dist) < (AnxrHapp_dist + HaprAnxp_dist)):
-                        Anx_Accuracy[nAnx]+=1
-                        Hap_Accuracy[nHap]+=1
+                #Calculate the accuracy
+                AnxrAnxp_dist = spatial.distance.cosine(self.Anxfeatures,self.predictedAnxVolumes)#dist Anx real vs Anx Predicted
+                AnxrHapp_dist = spatial.distance.cosine(self.Anxfeatures,self.predictedHapVolumes)#dist Anx real vs Hap Predicted  
+                HaprAnxp_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedAnxVolumes)#dist Hap real vs Anx Predicted         
+                HaprHapp_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedHapVolumes)#dist Hap real vs Hap Predicted
+                if((AnxrAnxp_dist+ HaprHapp_dist) < (AnxrHapp_dist + HaprAnxp_dist)):
+                    Anx_Accuracy[nAnx]+=1
+                    Hap_Accuracy[nHap]+=1
 
 
             for nNeu in range(self.numNeutests):
-                percentage = 100.0*(nAnx+1)*(self.numHaptests + nNeu)/total
-                print "User " + str(self.user) + ": " +  str(percentage)  + "%"
+
+                calculationNum = (nAnx+1)*self.numHaptests + nAnx*self.numNeutests  + nNeu + 1 
+                percentage = 100.0*calculationNum/total
+                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
+                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
+                print "EmoMus5_Test_2s -> Anxious descriptor " + str(nAnx+1) + " out " +  " and Neutral descriptor " + str(nNeu+1) + " out "
 
                 indNeu = self.descriptorsNeutralInd[nNeu]
                
-                wavFeatures = np.vstack((self.descriptorsAnxious[indAnx,:],self.descriptorsHappy,
+                descriptors = np.vstack((self.descriptorsAnxious[indAnx,:],self.descriptorsHappy,
                                        self.descriptorsNeutral[indNeu,:]))
 
+                self.predictedAnxVolumes = np.zeros(self.numSelFeatures)
+                self.predictedNeuVolumes = np.zeros(self.numSelFeatures)
 
                 for n in range(self.numSelFeatures):
+
                   k = self.f_ind[n]%self.lenY #y axis
                   rest = self.f_ind[n]/self.lenY 
                   j = rest%self.lenX #x axis
                   i = rest/self.lenX #z axis  
                   #print self.anxiousVolumes.shape
-                  self.Anxfeatures[n,:] = self.anxiousVolumes[:,j,k,i] # f_ind
-                  self.Hapfeatures[n,:] = self.happyVolumes[:,j,k,i] # f_ind 
-                  self.Neufeatures[n,:] = self.neutralVolumes[:,j,k,i] # f_ind
+                  self.Anxfeatures[n] = self.anxiousVolumes[nAnx,j,k,i] # f_ind
+                  self.Neufeatures[n] = self.neutralVolumes[nNeu,j,k,i] # f_ind
 
-                  meanFeatures = np.hstack((self.Anxfeatures[n,indAnx],self.Hapfeatures[n,:],
-                            self.Neufeatures[n,indNeu]))
+                  meanFeatures = np.hstack((self.anxiousVolumes[indAnx,j,k,i],self.happyVolumes[:,j,k,i],
+                            self.neutralVolumes[indNeu,j,k,i]))
 
                   if(PM_method == 'LinearReg'):
-                    regr = linear_model.LinearRegression() # self.wavFeatures is an n-by-p matrix of p predictors at each of n observations
-                    regr.fit( wavFeatures,meanFeatures)
+                    regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
+                    regr.fit(descriptors,meanFeatures)
                     # multiple linear regression models by allowing the response variable to be a function of k explanatory variables
                     #print regr.coef_ #coefficients #p0 + p1 + ...pn
-                    self.predictedAnxVolumes = regr.predict(self.descriptorsAnxious[nAnx,:]) # b0 + b1*p1 + ..bn*pn 
-                    self.predictedNeuVolumes = regr.predict(self.descriptorsNeutral[nNeu,:]) # b0 + b1*p1 + ..bn*pn
+                    self.predictedAnxVolumes[n] = regr.predict(self.descriptorsAnxious[nAnx,:]) # b0 + b1*p1 + ..bn*pn 
+                    self.predictedNeuVolumes[n] = regr.predict(self.descriptorsNeutral[nNeu,:]) # b0 + b1*p1 + ..bn*pn
                   else:
-                    svr.fit(wavFeatures, meanFeatures)
-                    self.predictedAnxVolumes = svr.predict(self.descriptorsAnxious[nAnx,:]) 
-                    self.predictedNeuVolumes = svr.predict(self.descriptorsNeutral[nNeu,:])
+                    svr.fit(descriptors, meanFeatures)
+                    self.predictedAnxVolumes[n] = svr.predict(self.descriptorsAnxious[nAnx,:]) 
+                    self.predictedNeuVolumes[n] = svr.predict(self.descriptorsNeutral[nNeu,:])
 
-                    #Calculate the accuracy
-                    AnxrAnxp_dist = spatial.distance.cosine(self.Anxfeatures[:,nAnx],self.predictedAnxVolumes)#dist Anx real vs Anx Predicted
-                    AnxrNeup_dist = spatial.distance.cosine(self.Anxfeatures[:,nAnx],self.predictedNeuVolumes)#dist Anx real vs Neu Predicted  
-                    NeurAnxp_dist = spatial.distance.cosine(self.Neufeatures[:,nNeu],self.predictedAnxVolumes)#dist Neu real vs Anx Predicted         
-                    NeurNeup_dist = spatial.distance.cosine(self.Neufeatures[:,nNeu],self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
-                    if((AnxrAnxp_dist+ NeurNeup_dist) < (AnxrNeup_dist + NeurAnxp_dist)):
-                        Anx_Accuracy[nAnx]+=1
-                        Neu_Accuracy[nNeu]+=1
+                #Calculate the accuracy
+                AnxrAnxp_dist = spatial.distance.cosine(self.Anxfeatures,self.predictedAnxVolumes)#dist Anx real vs Anx Predicted
+                AnxrNeup_dist = spatial.distance.cosine(self.Anxfeatures,self.predictedNeuVolumes)#dist Anx real vs Neu Predicted  
+                NeurAnxp_dist = spatial.distance.cosine(self.Neufeatures,self.predictedAnxVolumes)#dist Neu real vs Anx Predicted         
+                NeurNeup_dist = spatial.distance.cosine(self.Neufeatures,self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
+                if((AnxrAnxp_dist+ NeurNeup_dist) < (AnxrNeup_dist + NeurAnxp_dist)):
+                    Anx_Accuracy[nAnx]+=1
+                    Neu_Accuracy[nNeu]+=1
 
         for nHap in range(self.numHaptests): 
-            percentage = 100.0*(self.numAnxtests*(self.numHaptests + self.numNeutests) + nHap*self.numNeutests)/total
-            print "User " + str(self.user) + ": " + str(percentage) + "%"
+            #print "nHap %i",nHap
             indHap = self.descriptorsHappyInd[nHap]#we use the rest of experiments as training data for the mth test
             
             for nNeu in range(self.numNeutests): 
-                percentage = 100.0*(self.numAnxtests*(self.numHaptests + self.numNeutests)/total + (nHap+1)*nNeu)/total
-                print "User " + str(self.user) + ": " + str(percentage) + "%"
+
+                calculationNum = self.numAnxtests*(self.numHaptests + self.numNeutests) + nHap*self.numHaptests + nNeu + 1
+                percentage = 100.0*calculationNum/total
+                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
+                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
+                print "EmoMus5_Test_2s -> Happy descriptor " + str(nHap+1) + " out " +  " and Neutral descriptor " + str(nNeu+1) + " out "
+
                 indNeu = self.descriptorsNeutralInd[nNeu]#we use the rest of experiments as training data for the lth test
                 
-                wavFeatures = np.vstack((self.descriptorsAnxious,self.descriptorsHappy[indHap,:],
+                descriptors = np.vstack((self.descriptorsAnxious,self.descriptorsHappy[indHap,:],
                                        self.descriptorsNeutral[indNeu,:]))
 
+                self.predictedHapVolumes = np.zeros(self.numSelFeatures)
+                self.predictedNeuVolumes = np.zeros(self.numSelFeatures)
 
-                for n in range(sself.numSelFeatures):
+                for n in range(self.numSelFeatures):
                     k = self.f_ind[n]%self.lenY #y axis
                     rest = self.f_ind[n]/self.lenY 
                     j = rest%self.lenX #x axis
                     i = rest/self.lenX #z axis  
                     #print self.anxiousVolumes.shape
-                    self.Anxfeatures[n,:] = self.anxiousVolumes[:,j,k,i] # f_ind
-                    self.Hapfeatures[n,:] = self.happyVolumes[:,j,k,i] # f_ind 
-                    self.Neufeatures[n,:] = self.neutralVolumes[:,j,k,i] # f_ind
+            
+                    self.Hapfeatures[n] = self.happyVolumes[nHap,j,k,i] # f_ind 
+                    self.Neufeatures[n] = self.neutralVolumes[nNeu,j,k,i] # f_ind
 
-                    meanFeatures = np.hstack((self.Anxfeatures[n,:],self.Hapfeatures[n,indHap],
-                            self.Neufeatures[n,indNeu]))
+                    meanFeatures = np.hstack((self.anxiousVolumes[:,j,k,i],self.happyVolumes[indHap,j,k,i],
+                            self.neutralVolumes[indNeu,j,k,i]))
 
                     if(PM_method == 'LinearReg'):
-                      regr = linear_model.LinearRegression() # self.wavFeatures is an n-by-p matrix of p predictors at each of n observations
-                      regr.fit( wavFeatures,meanFeatures)
+                      regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
+                      regr.fit( descriptors,meanFeatures)
                       # multiple linear regression models by allowing the response variable to be a function of k explanatory variables
                       #print regr.coef_ #coefficients #p0 + p1 + ...pn
-                      self.predictedHapVolumes = regr.predict(self.descriptorsHappy[nHap,:]) # b0 + b1*p1 + ..bn*pn 
-                      self.predictedNeuVolumes = regr.predict(self.descriptorsNeutral[nNeu,:]) # b0 + b1*p1 + ..bn*pn
+                      self.predictedHapVolumes[n] = regr.predict(self.descriptorsHappy[nHap,:]) # b0 + b1*p1 + ..bn*pn 
+                      self.predictedNeuVolumes[n] = regr.predict(self.descriptorsNeutral[nNeu,:]) # b0 + b1*p1 + ..bn*pn
                     else:
-                      svr.fit(wavFeatures, meanFeatures)
-                      self.predictedHapVolumes = svr.predict(self.descriptorsHappy[nHap,:]) 
-                      self.predictedNeuVolumes = svr.predict(self.descriptorsNeutral[nNeu,:])
+                      svr.fit(descriptors, meanFeatures)
+                      self.predictedHapVolumes[n] = svr.predict(self.descriptorsHappy[nHap,:]) 
+                      self.predictedNeuVolumes[n] = svr.predict(self.descriptorsNeutral[nNeu,:])
 
-                      #Calculate the accuracy
-                      HaprHapp_dist = spatial.distance.cosine(self.Hapfeatures[:,nHap],self.predictedHapVolumes)#dist Hap real vs Hap Predicted
-                      HaprNeup_dist = spatial.distance.cosine(self.Hapfeatures[:,nHap],self.predictedNeuVolumes)#dist Hap real vs Neu Predicted  
-                      NeurHapp_dist = spatial.distance.cosine(self.Neufeatures[:,nNeu],self.predictedHapVolumes)#dist Neu real vs Hap Predicted         
-                      NeurNeup_dist = spatial.distance.cosine(self.Neufeatures[:,nNeu],self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
-                      if((HaprHapp_dist+ NeurNeup_dist) < (HaprNeup_dist + NeurHapp_dist)):
-                          Neu_Accuracy[nNeu]+=1
-                          Hap_Accuracy[nHap]+=1
+                #Calculate the accuracy
+                HaprHapp_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedHapVolumes)#dist Hap real vs Hap Predicted
+                HaprNeup_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedNeuVolumes)#dist Hap real vs Neu Predicted  
+                NeurHapp_dist = spatial.distance.cosine(self.Neufeatures,self.predictedHapVolumes)#dist Neu real vs Hap Predicted         
+                NeurNeup_dist = spatial.distance.cosine(self.Neufeatures,self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
+                if((HaprHapp_dist+ NeurNeup_dist) < (HaprNeup_dist + NeurHapp_dist)):
+                    Neu_Accuracy[nNeu]+=1
+                    Hap_Accuracy[nHap]+=1
               
         
         Anx_Accuracy/=(self.numHaptests + self.numNeutests )

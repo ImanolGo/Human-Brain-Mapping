@@ -82,7 +82,7 @@ class EmoMus5_Test():
             fileName = userPath.split("/")[-1]
             user = fileName.split(".")[0]
 
-            print "EmoMus5_Test_2s -> Test Number: " + " (" + str(userNum) + "/" + str(len(usersDir))+ ")"
+            print "EmoMus5_Test_2s -> Test Number: " + " (" + str(userNum+1) + "/" + str(len(usersDir))+ ")"
             print "EmoMus5_Test_2s -> User Name: "+ str(user) 
             
             fMRI = fa.fMRI_analysis(self.dir, user)  
@@ -104,9 +104,9 @@ class EmoMus5_Test():
                 print "EmoMus5_Test_2s -> Loading ANOVA analysis best voxel indexes with vector size of ", len(self.ANOVA_ind)
                 self.emotions = pickle.load(fi)
                 print "EmoMus5_Test_2s -> Loading fMRI scan indexes sorted to the different emotion music groups"
-                print "EmoMus5_Test_2s -> Emotion: Anxious " + str(self.emotions[0])
-                print "EmoMus5_Test_2s -> Emotion: Happy " + str(self.emotions[1])
-                print "EmoMus5_Test_2s -> Emotion: Neutral " + str(self.emotions[2])
+                #print "EmoMus5_Test_2s -> Emotion: Anxious " + str(self.emotions[0])
+                #print "EmoMus5_Test_2s -> Emotion: Happy " + str(self.emotions[1])
+                #print "EmoMus5_Test_2s -> Emotion: Neutral " + str(self.emotions[2])
 
                 fi.close()
                 
