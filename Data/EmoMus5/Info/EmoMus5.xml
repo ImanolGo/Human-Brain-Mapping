@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<Data>
+
+      <Anxious>
+
+      <scan id="A1">
+         <onset>408</onset>
+         <numScans>15</numScans>
+      </scan>
+
+
+       <scan id="A2">
+         <onset>264</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A3">
+         <onset>144</onset>
+         <numScans>15</numScans>
+      </scan>
+
+       <scan id="A4">
+         <onset>552</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A5">
+         <onset>432</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A6">
+         <onset>48</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A7">
+         <onset>120</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A8">
+         <onset>312</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B1">
+         <onset>960</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B2">
+         <onset>720</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B3">
+         <onset>792</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B4">
+         <onset>1080</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B5">
+         <onset>1032</onset>
+         <numScans>15</numScans>
+      </scan>
+
+     <scan id="B6">
+         <onset>576</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B7">
+         <onset>696</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B8">
+         <onset>936</onset>
+         <numScans>15</numScans>
+      </scan>
+
+   </Anxious>
+
+   <Happy>
+
+      <scan id="A1">
+         <onset>0</onset>
+         <numScans>15</numScans>
+      </scan>
+      
+      <scan id="A2">
+         <onset>96</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A3">
+         <onset>384</onset>
+         <numScans>15</numScans>
+      </scan>
+
+       <scan id="A4">
+         <onset>192</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A5">
+         <onset>168</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A6">
+         <onset>480</onset>
+         <numScans>15</numScans>
+      </scan>
+     
+
+      <scan id="A7">
+         <onset>288</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A8">
+         <onset>360</onset>
+         <numScans>15</numScans>
+      </scan>
+  
+
+     <scan id="B1">
+         <onset>600</onset>
+         <numScans>15</numScans>
+      </scan>
+      
+      <scan id="B2">
+         <onset>624</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B3">
+         <onset>1128</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B4">
+         <onset>840</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B5">
+         <onset>768</onset>
+         <numScans>15</numScans>
+      </scan>
+
+       <scan id="B6">
+         <onset>1008</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B7">
+         <onset>888</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B8">
+         <onset>984</onset>
+         <numScans>15</numScans>
+      </scan>
+
+   </Happy>
+
+   <Neutral>
+
+      <scan id="A3">
+         <onset>24</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A4">
+         <onset>72</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A1">
+         <onset>216</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A7">
+         <onset>240</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A5">
+         <onset>336</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A8">
+         <onset>456</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A6">
+         <onset>504</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="A2">
+         <onset>528</onset>
+         <numScans>15</numScans>
+      </scan>
+
+     <scan id="B3">
+         <onset>648</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B4">
+         <onset>672</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B1">
+         <onset>744</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B7">
+         <onset>816</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B5">
+         <onset>1104</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B8">
+         <onset>912</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B6">
+         <onset>1056</onset>
+         <numScans>15</numScans>
+      </scan>
+
+      <scan id="B2">
+         <onset>864</onset>
+         <numScans>15</numScans>
+      </scan>
+
+   </Neutral>
+
+</Data>
+
+
+

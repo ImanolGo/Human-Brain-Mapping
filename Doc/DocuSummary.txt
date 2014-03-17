@@ -1,0 +1,59 @@
+
+Te mando los descriptores de cada uno de los audios del experimento. Hemos sacado un conjunto de descriptores para cada pieza, o sea son descriptores globales a la pieza. Por lo tanto para entrenar los modelos (regresion lineal) habria que hacer para cada voxel el promedio de las activaciones durante la duracion de la pieza. Es decir sacar un volumen global para cada pieza, como si solo hubiera una imagen durante toda la pieza.
+
+Como hay 8 piezas para cada emocion (3 emociones: joy, fear, neutral) habria 8x3=24 training examples.
+
+
+......
+
+
+Por una parte, los datos del EmoMus5, están bien descritos. Entiendo que por cada fragmento musical hay 24 "scans", y cada onset representa donde empieza (por favor corrobóralo con el documento "EmoMus5_order_of_song_presentation.txt" ). 
+
+Si, es correcto. TR=2 segundos, o sea cada 2 seg hay un scan. Dado que cada trial (musica + pausa) dura 48 seg entonces hay 24 scans por fragmento musical. Sin embargo, solo los primeros 15 scans son durante el fragmento porque cada fragmento dura 30 seg. Por lo tanto, los numeros en EmoMus5_order_of_song_presentation.txt son scans (no segundos).
+
+Asi que habria que hacer el promedio de los 15 primeros scans de cada trial para obtener el promedio de actividad para cada voxel durante cada pieza. De hecho podriamos descartar los primeros 3 scans (para evitar el efecto delay) y quedarnos solo con 12 scans por fragmento.
+
+Luego hacer el modelo con linear regression o SVM con los features corresondientes a cada fragmento. 
+
+
+..... 
+
+
+EmoMus5:
+
+the file with the stimuli presentation (EmoMus5_order_of_song_presentation.txt) is very clear, thanks.
+Only one question here, the dimensions of the data seem to be (60,72,60,1163). However in the paper it implies  that it should be (64,64,37,1152). May be I am confusing something?
+
+
+There are a few extra scans after the experiment is over (hence 1152->1163) and the original data were not isotropic so during normalization they were resampled to 3x3x3mm which modified [64,64,37] to become [60,72,60].
+
+ 
+EmoMus7:
+
+EmoMus7_order_of_song_presentation.txt is not clear to me. Could you please give us a similar file as the one for EmoMus5? or explain us how it is organized? 
+Here also i am puzzled with the dimensions (60, 72, 60, 1200). According to the paper shouldn't they be (64,64,37,414) ?
+
+
+Same as above regarding the dimensions. In this case, the experiment only lasted 12' so we combined the data acquisition with two other ECM experiments. The data acquisition and normalization were identical to EmoMus5.
+The stimuli were also the same wav files. The text file EmoMus7_order_of_song_presentation.txt contains the same info as the equivalent file for EmoMus5. Because all the stimuli were presented consecutively, wherever you see for example:
+
+Onsets_Happy="325" 
+
+it really means:
+
+Onset_of_Happy_Song_1=325     
+Onset_of_Happy_Song_2=340     
+Onset_of_Happy_Song_3=355     
+Onset_of_Happy_Song_4=370     
+Onset_of_Happy_Song_5=385     
+Onset_of_Happy_Song_6=400     
+Onset_of_Happy_Song_7=415     
+Onset_of_Happy_Song_8=430 
+
+
+....
+
+
+Seria bueno hacer dos cosas, predecir la activación por fragmento cmo quedamos y por otra parte, tambien predecir la activacion por volumen. Para esto ultimo te tengo que mandar los descriptores sacados cada 2 segundos (TR=2) para que puedas asociar segumentos de audio de 2 segundos con cada volumen.
+Te mando esto en mi proximo mail.
+

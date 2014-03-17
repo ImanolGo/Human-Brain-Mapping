@@ -1,0 +1,60 @@
+
+THIS IS THE ORDER THAT THE MUSICAL EXCERPTS WERE PRESENTED TO ALL PARTICIPANTS.
+
+IN THIS EXPERIMENT, EACH EXCERPT WAS PRESENTED TWICE!
+
+EACH PRESENTATION LASTED 30 SECONDS.
+
+AFTER EACH EXCERPT THERE WERE 18 SECONDS WITHOUT MUSICAL STIMULATION (see Figure 1 in published article for details)
+
+
+ ####       NAME                  ONSET (in scans)             
+song{1} = 'A_hap_1'                  0
+song{2} = 'A_neu_3'                 24
+song{3} = 'A_anx_6'                 48
+song{4} = 'A_neu_4'                 72
+song{5} = 'A_hap_2'                 96
+song{6} = 'A_anx_7'                120
+song{7} = 'A_anx_3'                144
+song{8} = 'A_hap_5'                168
+song{9} = 'A_hap_4'                192
+song{10} = 'A_neu_1'               216
+song{11} = 'A_neu_7'               240
+song{12} = 'A_anx_2'               264
+song{13} = 'A_hap_7'               288
+song{14} = 'A_anx_8'               312
+song{15} = 'A_neu_5'               336
+song{16} = 'A_hap_8'               360
+song{17} = 'A_hap_3'               384
+song{18} = 'A_anx_1'               408
+song{19} = 'A_anx_5'               432
+song{20} = 'A_neu_8'               456
+song{21} = 'A_hap_6'               480
+song{22} = 'A_neu_6'               504
+song{23} = 'A_neu_2'               528
+song{24} = 'A_anx_4'               552
+song{25} = 'B_anx_6'               576
+song{26} = 'B_hap_1'               600
+song{27} = 'B_hap_2'               624
+song{28} = 'B_neu_3'               648
+song{29} = 'B_neu_4'               672
+song{30} = 'B_anx_7'               696
+song{31} = 'B_anx_2'               720
+song{32} = 'B_neu_1'               744
+song{33} = 'B_hap_5'               768
+song{34} = 'B_anx_3'               792
+song{35} = 'B_neu_7'               816
+song{36} = 'B_hap_4'               840
+song{37} = 'B_neu_2'               864
+song{38} = 'B_hap_7'               888
+song{39} = 'B_neu_8'               912
+song{40} = 'B_anx_8'               936
+song{41} = 'B_anx_1'               960
+song{42} = 'B_hap_8'               984
+song{43} = 'B_hap_6'              1008
+song{44} = 'B_anx_5'              1032
+song{45} = 'B_neu_6'              1056
+song{46} = 'B_anx_4'              1080
+song{47} = 'B_neu_5'              1104
+song{48} = 'B_hap_3'              1128
+                                   
