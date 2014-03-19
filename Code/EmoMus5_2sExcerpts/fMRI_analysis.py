@@ -182,8 +182,8 @@ class fMRI_analysis():
       #self.PM_list = ['LinearReg','SVR_rbf']
       
       # The list of prediction model analysis methods
-      self.PM_list = ['LinearReg','SVR_rbf'] 
       self.PM_list = ['LinearReg'] 
+      #self.PM_list = ['LinearReg'] 
       print "EmoMus5_Test_2s -> Prediction Model Analysis methods: " + str(self.PM_list)  
 
       # The list of distance types measurements to use
@@ -192,11 +192,11 @@ class fMRI_analysis():
       
       # The number of features that you will use
       self.numFeat_list = [self.f_ind.shape[0]]
+      self.numFeat_list = [10]
       print "EmoMus5_Test_2s -> Making the analysis for the best " + str(self.numFeat_list) + " ANOVA analysis voxels"
 
       self.dist = self.distance_list[0]
       self.numSelFeatures = self.numFeat_list[0]
-      self.numSelFeatures = 1
 
     def _createDescriptorMatrices(self):
         
@@ -262,12 +262,15 @@ class fMRI_analysis():
 
         print "EmoMus5_Test_2s -> Anxious music descriptors dimensions: " + str(self.descriptorsAnxious.shape)
         print "EmoMus5_Test_2s -> Happy music descriptors dimensions: " + str(self.descriptorsHappy.shape)
-        print "EmoMus5_Test_2s -> Neutral music descriptors dimensionspe: " + str(self.descriptorsNeutral.shape)
+        print "EmoMus5_Test_2s -> Neutral music descriptors dimensions: " + str(self.descriptorsNeutral.shape)
 
         self.numAnxtests = self.descriptorsAnxious.shape[0]
         self.numHaptests = self.descriptorsHappy.shape[0]
         self.numNeutests = self.descriptorsNeutral.shape[0]
 
+        self.numAnxtests = 10
+        self.numHaptests = 10
+        self.numNeutests = 10
         print "EmoMus5_Test_2s -> Anxious music descriptors number: " + str(self.numAnxtests)
         print "EmoMus5_Test_2s -> Happy music descriptors number: " + str(self.numHaptests)
         print "EmoMus5_Test_2s -> Neutral music descriptors number: " + str(self.numNeutests)
@@ -276,14 +279,13 @@ class fMRI_analysis():
 
         print "EmoMus5_Test_2s -> Creating leave two out cross validation indexes " 
 
-        for i in range(self.descriptorsAnxious.shape[1]):
-            self.descriptorsAnxiousInd = []
-            for n in range(self.numAnxtests):
-                 ind = []
-                 for m in range(self.numAnxtests):
-                     if(not(m == n)):
-                         ind.append(m)
-                 self.descriptorsAnxiousInd.append(ind)
+        self.descriptorsAnxiousInd = []
+        for n in range(self.numAnxtests):
+             ind = []
+             for m in range(self.numAnxtests):
+                 if(not(m == n)):
+                     ind.append(m)
+             self.descriptorsAnxiousInd.append(ind)
 
         self.descriptorsHappyInd = []
         for n in range(self.numHaptests):
@@ -299,8 +301,7 @@ class fMRI_analysis():
              for m in range(self.numNeutests):
                  if(not(m == n)):
                      ind.append(m)
-             self.descriptorsNeutralInd.append(ind)      
-      
+             self.descriptorsNeutralInd.append(ind)    
            
     def _CalcPredictionModel(self, PM_method):
 
@@ -312,10 +313,10 @@ class fMRI_analysis():
             svr = svm.SVR(kernel='poly', degree=1) #polynomial kernel, degree 2.
         elif (PM_method == 'SVR_rbf'):
             svr = svm.SVR(kernel='rbf', C=1e4, gamma=0.1) # Radial Basis Function Kernel
-       
-        Anx_Accuracy = np.zeros((self.numAnxtests)) 
-        Hap_Accuracy = np.zeros((self.numHaptests)) 
-        Neu_Accuracy = np.zeros((self.numNeutests)) 
+
+        Anx_Accuracy = 0 
+        Hap_Accuracy = 0
+        Neu_Accuracy = 0 
 
         self.Anxfeatures = np.zeros([self.numSelFeatures])
         self.Hapfeatures = np.zeros([self.numSelFeatures])
@@ -359,6 +360,7 @@ class fMRI_analysis():
                   meanFeatures = np.hstack((self.anxiousVolumes[indAnx,j,k,i],self.happyVolumes[indHap,j,k,i],
                               self.neutralVolumes[:,j,k,i] ))
                   
+                  #Predict every voxel with the left out descriptors
                   if(PM_method == 'LinearReg'):
                     regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
                     regr.fit(descriptors,meanFeatures)
@@ -377,15 +379,14 @@ class fMRI_analysis():
                 HaprAnxp_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedAnxVolumes)#dist Hap real vs Anx Predicted         
                 HaprHapp_dist = spatial.distance.cosine(self.Hapfeatures,self.predictedHapVolumes)#dist Hap real vs Hap Predicted
                 if((AnxrAnxp_dist+ HaprHapp_dist) < (AnxrHapp_dist + HaprAnxp_dist)):
-                    Anx_Accuracy[nAnx]+=1
-                    Hap_Accuracy[nHap]+=1
-
+                  Anx_Accuracy += 1
+                  Hap_Accuracy += 1
+                  
 
             for nNeu in range(self.numNeutests):
 
                 calculationNum = (nAnx+1)*self.numHaptests + nAnx*self.numNeutests  + nNeu + 1 
                 percentage = 100.0*calculationNum/total
-                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
                 print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
                 print "EmoMus5_Test_2s -> Anxious descriptor " + str(nAnx+1) + " out " +  " and Neutral descriptor " + str(nNeu+1) + " out "
 
@@ -410,6 +411,7 @@ class fMRI_analysis():
                   meanFeatures = np.hstack((self.anxiousVolumes[indAnx,j,k,i],self.happyVolumes[:,j,k,i],
                             self.neutralVolumes[indNeu,j,k,i]))
 
+                  #Predict every voxel with the left out descriptors
                   if(PM_method == 'LinearReg'):
                     regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
                     regr.fit(descriptors,meanFeatures)
@@ -428,8 +430,9 @@ class fMRI_analysis():
                 NeurAnxp_dist = spatial.distance.cosine(self.Neufeatures,self.predictedAnxVolumes)#dist Neu real vs Anx Predicted         
                 NeurNeup_dist = spatial.distance.cosine(self.Neufeatures,self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
                 if((AnxrAnxp_dist+ NeurNeup_dist) < (AnxrNeup_dist + NeurAnxp_dist)):
-                    Anx_Accuracy[nAnx]+=1
-                    Neu_Accuracy[nNeu]+=1
+                    Anx_Accuracy+=1
+                    Neu_Accuracy+=1 
+
 
         for nHap in range(self.numHaptests): 
             #print "nHap %i",nHap
@@ -439,7 +442,6 @@ class fMRI_analysis():
 
                 calculationNum = self.numAnxtests*(self.numHaptests + self.numNeutests) + nHap*self.numHaptests + nNeu + 1
                 percentage = 100.0*calculationNum/total
-                print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
                 print "EmoMus5_Test_2s -> Processing... ( " + str(calculationNum) + " / " + str(total) + " ) = " +  str(percentage) + "%"
                 print "EmoMus5_Test_2s -> Happy descriptor " + str(nHap+1) + " out " +  " and Neutral descriptor " + str(nNeu+1) + " out "
 
@@ -456,7 +458,6 @@ class fMRI_analysis():
                     rest = self.f_ind[n]/self.lenY 
                     j = rest%self.lenX #x axis
                     i = rest/self.lenX #z axis  
-                    #print self.anxiousVolumes.shape
             
                     self.Hapfeatures[n] = self.happyVolumes[nHap,j,k,i] # f_ind 
                     self.Neufeatures[n] = self.neutralVolumes[nNeu,j,k,i] # f_ind
@@ -464,6 +465,7 @@ class fMRI_analysis():
                     meanFeatures = np.hstack((self.anxiousVolumes[:,j,k,i],self.happyVolumes[indHap,j,k,i],
                             self.neutralVolumes[indNeu,j,k,i]))
 
+                    #Predict every voxel with the left out descriptors
                     if(PM_method == 'LinearReg'):
                       regr = linear_model.LinearRegression() # self.descriptors is an n-by-p matrix of p predictors at each of n observations
                       regr.fit( descriptors,meanFeatures)
@@ -482,25 +484,33 @@ class fMRI_analysis():
                 NeurHapp_dist = spatial.distance.cosine(self.Neufeatures,self.predictedHapVolumes)#dist Neu real vs Hap Predicted         
                 NeurNeup_dist = spatial.distance.cosine(self.Neufeatures,self.predictedNeuVolumes)#dist Neu real vs Neu Predicted
                 if((HaprHapp_dist+ NeurNeup_dist) < (HaprNeup_dist + NeurHapp_dist)):
-                    Neu_Accuracy[nNeu]+=1
-                    Hap_Accuracy[nHap]+=1
-              
-        
-        Anx_Accuracy/=(self.numHaptests + self.numNeutests )
-        Hap_Accuracy/=(self.numAnxtests + self.numNeutests )
-        Neu_Accuracy/=(self.numHaptests + self.numAnxtests )
-                
-        self.PMaccuracy = [] 
-        self.PMaccuracy.append(np.mean(Anx_Accuracy)*100)
-        self.PMaccuracy.append(np.mean(Hap_Accuracy)*100)
-        self.PMaccuracy.append(np.mean(Neu_Accuracy)*100)
-   
+                  Neu_Accuracy+=1
+                  Hap_Accuracy+=1
+
+
+        Anx_Accuracy = float(Anx_Accuracy)
+        Hap_Accuracy = float(Hap_Accuracy)
+        Neu_Accuracy = float(Neu_Accuracy)
     
 
+        Anx_Accuracy/=(self.numHaptests*self.numAnxtests + self.numNeutests*self.numAnxtests )
+        Anx_Accuracy*=100
+        print "EmoMus5_Test_2s -> Anxious Happy = "  + str(Anx_Accuracy) + "%"
 
+        Hap_Accuracy/=(self.numAnxtests*self.numHaptests + self.numNeutests*self.numHaptests )
+        Hap_Accuracy*=100
+        print "EmoMus5_Test_2s -> Accuracy Anxious = "+ str(Hap_Accuracy) + "%"
 
-
-
+        Neu_Accuracy/=(self.numAnxtests*self.numNeutests + self.numHaptests*self.numNeutests )
+        Neu_Accuracy*=100   
+        print "EmoMus5_Test_2s -> Accuracy Neutral = "+ str(Neu_Accuracy) + "%"
+                
+        self.PMaccuracy = [] 
+        self.PMaccuracy.append(Anx_Accuracy)
+        self.PMaccuracy.append(Hap_Accuracy)
+        self.PMaccuracy.append(Neu_Accuracy)
+   
+    
 
     def _readFeatures(self,filename, separator=','):
         """ Read a file with an arbitrary number of columns.
