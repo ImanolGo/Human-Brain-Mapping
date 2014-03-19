@@ -1,3 +1,10 @@
+Run Instructions
+*******************
+
+- Make sure that the folder /Data/EmoMus5/Data/ contains the proper *.nii.gz files (0130.nii.gz, 0132.nii.gz.....0494.nii.gz )
+
+- To run just go into any folder in /Code and run "$ python main.py"
+
 Additional libraries
 *************************
 

@@ -192,7 +192,7 @@ class fMRI_analysis():
       
       # The number of features that you will use
       self.numFeat_list = [self.f_ind.shape[0]]
-      self.numFeat_list = [10]
+      #self.numFeat_list = [10]
       print "EmoMus5_Test_2s -> Making the analysis for the best " + str(self.numFeat_list) + " ANOVA analysis voxels"
 
       self.dist = self.distance_list[0]
@@ -268,9 +268,9 @@ class fMRI_analysis():
         self.numHaptests = self.descriptorsHappy.shape[0]
         self.numNeutests = self.descriptorsNeutral.shape[0]
 
-        self.numAnxtests = 10
-        self.numHaptests = 10
-        self.numNeutests = 10
+        #self.numAnxtests = 10
+        #self.numHaptests = 10
+        #self.numNeutests = 10
         print "EmoMus5_Test_2s -> Anxious music descriptors number: " + str(self.numAnxtests)
         print "EmoMus5_Test_2s -> Happy music descriptors number: " + str(self.numHaptests)
         print "EmoMus5_Test_2s -> Neutral music descriptors number: " + str(self.numNeutests)
